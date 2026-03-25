@@ -1,0 +1,35 @@
+services:
+  disk-monitor:
+    build: .
+    container_name: disk-monitor-poc
+    
+    # Montar el sistema de archivos del host
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+      - test_volume:/test_data:rw  # Volumen limitado para testing
+    
+    # Variables de entorno
+    environment:
+      CHECK_INTERVAL: "30"          # Verificar cada 30 segundos (POC rápido)
+      LOG_LEVEL: "INFO"
+      EMAIL_ENABLED: "False"        # Desabilitar email para POC
+      
+    # Políticas de reinicio
+    restart: unless-stopped
+    
+    # Logs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+# Volumen con espacio limitado para pruebas
+volumes:
+  test_volume:
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=200m  # Limita a 200MB para demostración
